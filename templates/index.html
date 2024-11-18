@@ -11,7 +11,6 @@
             padding: 0;
         }
 
-        /* Header design */
         header {
             display: flex;
             justify-content: space-between;
@@ -39,7 +38,6 @@
             padding: 10px;
         }
 
-        /* Main container */
         .container {
             padding: 20px;
         }
@@ -76,14 +74,20 @@
             background-color: #f4f4f4;
         }
 
-        /* Footer for spacing */
+        .special-cell {
+            background-color: #ffeb3b;
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+            text-transform: uppercase;
+        }
+
         footer {
             height: 50px;
         }
     </style>
 </head>
 <body>
-    <!-- Header Section -->
     <header>
         <div class="buttons">
             <input type="file" id="fileUpload" accept=".xlsx">
@@ -93,14 +97,11 @@
         <div class="message-box" id="messageBox">System Messages Will Appear Here</div>
     </header>
 
-    <!-- Main Container -->
     <div class="container">
-        <!-- Scan Box -->
         <div class="scan-box">
             <input type="text" id="barcodeInput" placeholder="Scan Box " onkeypress="if(event.key === 'Enter') fetchData();">
         </div>
 
-        <!-- Table for Scanned Data -->
         <table>
             <thead>
                 <tr>
@@ -109,9 +110,7 @@
                     <th>Route</th>
                 </tr>
             </thead>
-            <tbody id="dataTable">
-                <!-- Scanned Data Will Appear Here -->
-            </tbody>
+            <tbody id="dataTable"></tbody>
         </table>
     </div>
 
@@ -145,12 +144,26 @@
 
         function addRowToTable(trackingId, address, route) {
             const table = document.getElementById('dataTable');
-            const row = `<tr>
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
                 <td>${trackingId}</td>
                 <td>${address}</td>
                 <td>${route}</td>
-            </tr>`;
-            table.insertAdjacentHTML('afterbegin', row);
+            `;
+
+            table.insertAdjacentElement('afterbegin', row);
+
+            // Ensure the first row always has the special design for the Route column
+            const rows = table.getElementsByTagName('tr');
+            if (rows.length > 0) {
+                rows[0].cells[2].classList.add('special-cell');
+            }
+
+            // Remove the special design from other rows (if any)
+            for (let i = 1; i < rows.length; i++) {
+                rows[i].cells[2].classList.remove('special-cell');
+            }
 
             // Keep only 5 rows in the table
             while (table.rows.length > 5) {
@@ -208,4 +221,3 @@
     </script>
 </body>
 </html>
-
