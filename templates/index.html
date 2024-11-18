@@ -1,1 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>পার্সেল রাউটিং সিস্টেম</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header design */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .buttons button, .buttons input[type="file"] {
+            font-size: 16px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .message-box {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: right;
+            padding: 10px;
+        }
+
+        /* Main container */
+        .container {
+            padding: 20px;
+        }
+
+        .scan-box {
+            margin-bottom: 20px;
+        }
+
+        .scan-box input {
+            font-size: 18px;
+            padding: 10px;
+            width: 20%;
+            box-sizing: border-box;
+            border: 2px solid #333;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 90%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #333;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        /* Footer for spacing */
+        footer {
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="buttons">
+            <input type="file" id="fileUpload" accept=".xlsx">
+            <button onclick="uploadExcel()">Upload</button>
+            <button onclick="resetDatabase()" style="background-color: red; color: white;">Reset Database</button>
+        </div>
+        <div class="message-box" id="messageBox">System Messages Will Appear Here</div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Scan Box -->
+        <div class="scan-box">
+            <input type="text" id="barcodeInput" placeholder="Scan Box " onkeypress="if(event.key === 'Enter') fetchData();">
+        </div>
+
+        <!-- Table for Scanned Data -->
+        <table>
+            <thead>
+                <tr>
+                    <th>TRACKING_ID</th>
+                    <th>DELIVERY_ADDRESS</th>
+                    <th>Route</th>
+                </tr>
+            </thead>
+            <tbody id="dataTable">
+                <!-- Scanned Data Will Appear Here -->
+            </tbody>
+        </table>
+    </div>
+
+    <footer></footer>
+
+    <script>
+        function fetchData() {
+            const barcodeID = document.getElementById('barcodeInput').value.trim();
+            if (barcodeID) {
+                fetch(`/get-data?id=${barcodeID}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const messageBox = document.getElementById('messageBox');
+                        if (data.success) {
+                            addRowToTable(data.tracking_id, data.address, data.route);
+                            messageBox.textContent = "Data fetched successfully!";
+                            messageBox.style.color = "white";
+                        } else {
+                            messageBox.textContent = "No data found!";
+                            messageBox.style.color = "red";
+                        }
+                        document.getElementById('barcodeInput').value = "";
+                    })
+                    .catch(() => {
+                        const messageBox = document.getElementById('messageBox');
+                        messageBox.textContent = "Error occurred. Please try again.";
+                        messageBox.style.color = "red";
+                    });
+            }
+        }
+
+        function addRowToTable(trackingId, address, route) {
+            const table = document.getElementById('dataTable');
+            const row = `<tr>
+                <td>${trackingId}</td>
+                <td>${address}</td>
+                <td>${route}</td>
+            </tr>`;
+            table.insertAdjacentHTML('afterbegin', row);
+
+            // Keep only 5 rows in the table
+            while (table.rows.length > 5) {
+                table.deleteRow(-1);
+            }
+        }
+
+        function uploadExcel() {
+            const fileInput = document.getElementById('fileUpload').files[0];
+            const formData = new FormData();
+            formData.append('file', fileInput);
+
+            fetch('/upload-excel', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const messageBox = document.getElementById('messageBox');
+                    if (data.success) {
+                        messageBox.textContent = "Database uploaded successfully!";
+                        messageBox.style.color = "green";
+                    } else {
+                        messageBox.textContent = "Upload failed!";
+                        messageBox.style.color = "red";
+                    }
+                })
+                .catch(() => {
+                    const messageBox = document.getElementById('messageBox');
+                    messageBox.textContent = "Error occurred during upload.";
+                    messageBox.style.color = "red";
+                });
+        }
+
+        function resetDatabase() {
+            fetch('/reset-database', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    const messageBox = document.getElementById('messageBox');
+                    if (data.success) {
+                        messageBox.textContent = "Database reset successfully!";
+                        messageBox.style.color = "green";
+                    } else {
+                        messageBox.textContent = "Database reset failed!";
+                        messageBox.style.color = "red";
+                    }
+                    document.getElementById('dataTable').innerHTML = "";
+                })
+                .catch(() => {
+                    const messageBox = document.getElementById('messageBox');
+                    messageBox.textContent = "Error occurred during reset.";
+                    messageBox.style.color = "red";
+                });
+        }
+    </script>
+</body>
+</html>
 
