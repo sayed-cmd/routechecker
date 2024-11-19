@@ -25,7 +25,7 @@
             gap: 10px;
         }
 
-        .buttons button, .buttons input[type="file"] {
+        .buttons button {
             font-size: 16px;
             padding: 10px;
             cursor: pointer;
@@ -90,8 +90,7 @@
 <body>
     <header>
         <div class="buttons">
-            <input type="file" id="fileUpload" accept=".xlsx">
-            <button onclick="uploadExcel()">Upload</button>
+            <button onclick="getGoogleSheetData()">Get Data</button>
             <button onclick="resetDatabase()" style="background-color: red; color: white;">Reset Database</button>
         </div>
         <div class="message-box" id="messageBox">System Messages Will Appear Here</div>
@@ -117,6 +116,26 @@
     <footer></footer>
 
     <script>
+        function getGoogleSheetData() {
+            fetch('/get-data-from-google-sheet', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    const messageBox = document.getElementById('messageBox');
+                    if (data.success) {
+                        messageBox.textContent = data.message;
+                        messageBox.style.color = "green";
+                    } else {
+                        messageBox.textContent = data.message;
+                        messageBox.style.color = "red";
+                    }
+                })
+                .catch(() => {
+                    const messageBox = document.getElementById('messageBox');
+                    messageBox.textContent = "Error occurred while fetching Google Sheet data.";
+                    messageBox.style.color = "red";
+                });
+        }
+
         function fetchData() {
             const barcodeID = document.getElementById('barcodeInput').value.trim();
             if (barcodeID) {
@@ -154,48 +173,18 @@
 
             table.insertAdjacentElement('afterbegin', row);
 
-            // Ensure the first row always has the special design for the Route column
             const rows = table.getElementsByTagName('tr');
             if (rows.length > 0) {
                 rows[0].cells[2].classList.add('special-cell');
             }
 
-            // Remove the special design from other rows (if any)
             for (let i = 1; i < rows.length; i++) {
                 rows[i].cells[2].classList.remove('special-cell');
             }
 
-            // Keep only 5 rows in the table
             while (table.rows.length > 5) {
                 table.deleteRow(-1);
             }
-        }
-
-        function uploadExcel() {
-            const fileInput = document.getElementById('fileUpload').files[0];
-            const formData = new FormData();
-            formData.append('file', fileInput);
-
-            fetch('/upload-excel', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    const messageBox = document.getElementById('messageBox');
-                    if (data.success) {
-                        messageBox.textContent = "Database uploaded successfully!";
-                        messageBox.style.color = "green";
-                    } else {
-                        messageBox.textContent = "Upload failed!";
-                        messageBox.style.color = "red";
-                    }
-                })
-                .catch(() => {
-                    const messageBox = document.getElementById('messageBox');
-                    messageBox.textContent = "Error occurred during upload.";
-                    messageBox.style.color = "red";
-                });
         }
 
         function resetDatabase() {
@@ -204,10 +193,10 @@
                 .then(data => {
                     const messageBox = document.getElementById('messageBox');
                     if (data.success) {
-                        messageBox.textContent = "Database reset successfully!";
+                        messageBox.textContent = data.message;
                         messageBox.style.color = "green";
                     } else {
-                        messageBox.textContent = "Database reset failed!";
+                        messageBox.textContent = data.message;
                         messageBox.style.color = "red";
                     }
                     document.getElementById('dataTable').innerHTML = "";
