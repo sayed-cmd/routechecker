@@ -1,10 +1,10 @@
 # Parcel Routing System
 
-A simple Parcel Routing System that allows users to upload parcel data, fetch tracking details, and display the results in a dynamic table. The system is built with HTML, CSS, and JavaScript, providing a user-friendly interface for seamless parcel tracking and route management.
+A simple Parcel Routing System that allows users to get data from Google Sheets, fetch tracking details, and display the results in a dynamic table. The system is built with HTML, CSS, and JavaScript, providing a user-friendly interface for seamless parcel tracking and route management.
 
 ## Features
 
-- Upload Database: Upload `.xlsx` files to update the parcel database.
+- Get data from the Google sheet to update the parcel database.
 - Scan Box: Input tracking IDs to fetch parcel details dynamically.
 - Dynamic Table:
   - Displays the most recent parcel details.
@@ -22,10 +22,10 @@ A simple Parcel Routing System that allows users to upload parcel data, fetch tr
 1. Clone the Repository: git clone https://github.com/sayed-cmd/routechecker.git cd parcel-routing-system
 2. Run the Project:
 - Open `index.html` in your favorite browser.
-- Ensure your server API is running to handle requests (`/get-data`, `/upload-excel`, `/reset-database`).
+- Ensure your server API is running to handle requests (`/get-data`, `/get-data-from-google-sheet`, `/reset-database`).
 
-3. Upload Database:
-- Click the Upload button to upload an `.xlsx` file containing parcel details.
+3. Load Database:
+- Click the Get Data Button
 
 4. Fetch Parcel Data:
 - Enter the tracking ID in the Scan Box and press Enter to fetch details.
@@ -43,18 +43,18 @@ parcel-routing-system/ ├── index.html # Main HTML file ├── style.css
 
 - Frontend: HTML, CSS, JavaScript
 - Backend API: Required for database operations and fetching data
-- Excel Parsing: Supports `.xlsx` file uploads
+- Get-data-from-google-sheet: Supports `direct google sheet links
 
 ## API Endpoints
 
 - GET /get-data: Fetch parcel data based on tracking ID.
-- POST /upload-excel: Upload new parcel database.
+- POST /get_data_from_google_sheet: Upload new parcel database.
 - POST /reset-database: Reset the database to its initial state.
 
 ## Installation Requirements
 
 - Modern browser (Chrome, Firefox, etc.)
-- Backend API or server to handle requests (configure `/get-data`, `/upload-excel`, `/reset-database`).
+- Backend API or server to handle requests (configure `/get-data`, `/get-data-from-google-sheet`, `/reset-database`).
 
 ## Contributing
 
