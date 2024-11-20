@@ -88,6 +88,7 @@
     </style>
 </head>
 <body>
+    <audio id="errorBeep" src="/static/sounds/error-beep.mp3"></audio>
     <header>
         <div class="buttons">
             <button onclick="getGoogleSheetData()">Get Data</button>
@@ -137,29 +138,34 @@
         }
 
         function fetchData() {
-            const barcodeID = document.getElementById('barcodeInput').value.trim();
-            if (barcodeID) {
-                fetch(`/get-data?id=${barcodeID}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const messageBox = document.getElementById('messageBox');
-                        if (data.success) {
-                            addRowToTable(data.tracking_id, data.address, data.route);
-                            messageBox.textContent = "Data fetched successfully!";
-                            messageBox.style.color = "white";
-                        } else {
-                            messageBox.textContent = "No data found!";
-                            messageBox.style.color = "red";
-                        }
-                        document.getElementById('barcodeInput').value = "";
-                    })
-                    .catch(() => {
-                        const messageBox = document.getElementById('messageBox');
-                        messageBox.textContent = "Error occurred. Please try again.";
-                        messageBox.style.color = "red";
-                    });
-            }
-        }
+    const barcodeID = document.getElementById('barcodeInput').value.trim();
+    const errorBeep = document.getElementById('errorBeep');
+
+    if (barcodeID) {
+        fetch(`/get-data?id=${barcodeID}`)
+            .then(response => response.json())
+            .then(data => {
+                const messageBox = document.getElementById('messageBox');
+                if (data.success) {
+                    addRowToTable(data.tracking_id, data.address, data.route);
+                    messageBox.textContent = "Data fetched successfully!";
+                    messageBox.style.color = "white";
+                } else {
+                    messageBox.textContent = "No data found!";
+                    messageBox.style.color = "red";
+                    errorBeep.play(); // বিপ সাউন্ড বাজবে
+                }
+                document.getElementById('barcodeInput').value = "";
+            })
+            .catch(() => {
+                const messageBox = document.getElementById('messageBox');
+                messageBox.textContent = "Error occurred. Please try again.";
+                messageBox.style.color = "red";
+                errorBeep.play(); // বিপ সাউন্ড বাজবে
+            });
+    }
+}
+
 
         function addRowToTable(trackingId, address, route) {
             const table = document.getElementById('dataTable');
